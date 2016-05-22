@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="">
+	<typeAlias alias="IbatisHsCriteria" type="com.hs.ibatis.criterion.beans.IbatisCriteria" />
+	
+	<sql id="ibatis_hsCriteriaMySql">
+		<isNotEmpty prepend="AND" property="criteria">
+			 <![CDATA[ 1=1 ]]> 
+			<iterate prepend="" open="" close="" property="criteria">
+				<isEqual prepend="AND" property="criteria[].op" compareValue="eq">
+					<![CDATA[$criteria[].property$ = #criteria[].value#]]>
+				</isEqual>
+				<isEqual prepend="AND" property="criteria[].op" compareValue="ieq">
+					<![CDATA[lower($criteria[].property$) = #criteria[].value#]]>
+				</isEqual>
+				<isEqual prepend="AND" property="criteria[].op" compareValue="ne">
+					<![CDATA[$criteria[].property$ <> #criteria[].value#]]>
+				</isEqual>
+				<isEqual prepend="AND" property="criteria[].op" compareValue="like">
+					<isEqual prepend="" property="criteria[].matchMode" compareValue="EXACT">
+						<![CDATA[$criteria[].property$ like #criteria[].value#]]>
+					</isEqual>
+					<isEqual prepend="" property="criteria[].matchMode" compareValue="START">
+						<![CDATA[$criteria[].property$ like CONCAT('%',#criteria[].value#)]]>
+					</isEqual>
+					<isEqual prepend="" property="criteria[].matchMode" compareValue="END">
+						<![CDATA[$criteria[].property$ like CONCAT(#criteria[].value#,'%')]]>
+					</isEqual>
+					<isEqual prepend="" property="criteria[].matchMode" compareValue="ANYWHERE">
+						<![CDATA[$criteria[].property$ like CONCAT('%',#criteria[].value#,'%')]]>
+					</isEqual>
+				</isEqual>
+				
+				<isEqual prepend="AND" property="criteria[].op" compareValue="ilike">
+					<isEqual prepend="" property="criteria[].matchMode" compareValue="EXACT">
+						<![CDATA[lower($criteria[].property$) like #criteria[].value#]]>
+					</isEqual>
+					<isEqual prepend="" property="criteria[].matchMode" compareValue="START">
+						<![CDATA[lower($criteria[].property$) like CONCAT('%',#criteria[].value#)]]>
+					</isEqual>
+					<isEqual prepend="" property="criteria[].matchMode" compareValue="END">
+						<![CDATA[lower($criteria[].property$) like CONCAT(#criteria[].value#,'%')]]>
+					</isEqual>
+					<isEqual prepend="" property="criteria[].matchMode" compareValue="ANYWHERE">
+						<![CDATA[lower($criteria[].property$) like CONCAT('%',#criteria[].value#,'%')]]>
+					</isEqual>
+				</isEqual>
+				
+				<isEqual prepend="AND" property="criteria[].op" compareValue="gt">
+					<![CDATA[$criteria[].property$ > #criteria[].value#]]>
+				</isEqual>
+				
+				<isEqual prepend="AND" property="criteria[].op" compareValue="lt">
+					<![CDATA[$criteria[].property$ < #criteria[].value#]]>
+				</isEqual>
+				
+				<isEqual prepend="AND" property="criteria[].op" compareValue="le">
+					<![CDATA[$criteria[].property$ <= #criteria[].value#]]>
+				</isEqual>
+				
+				<isEqual prepend="AND" property="criteria[].op" compareValue="ge">
+					<![CDATA[$criteria[].property$ >= #criteria[].value#]]>
+				</isEqual>
+				
+				<isEqual prepend="AND" property="criteria[].op" compareValue="in">
+					<![CDATA[$criteria[].property$ IN]]>
+					<iterate open="(" close=")" conjunction="," property="criteria[].value" >   
+                     		<![CDATA[#criteria[].value[]# ]]> 
+               		 </iterate>
+				</isEqual>
+				
+				<isEqual prepend="AND" property="criteria[].op" compareValue="notin">
+					<![CDATA[$criteria[].property$ NOT IN]]>
+					<iterate open="(" close=")" conjunction="," property="criteria[].value" >   
+                     		<![CDATA[#criteria[].value[]# ]]>  
+               		 </iterate>
+				</isEqual>
+				
+				<isEqual prepend="AND" property="criteria[].op" compareValue="isNull">
+					<![CDATA[$criteria[].property$ IS NULL]]>
+				</isEqual>
+				
+				<isEqual prepend="AND" property="criteria[].op" compareValue="isNotNull">
+					<![CDATA[$criteria[].property$ IS NOT NULL]]>
+				</isEqual>
+				
+				<isEqual prepend="AND" property="criteria[].op" compareValue="notBetween">
+					<![CDATA[
+						($criteria[].property$ NOT BETWEEN #criteria[].lo# AND #criteria[].hi#)
+					]]>
+				</isEqual>
+				
+				<isEqual prepend="AND" property="criteria[].op" compareValue="between">
+					<![CDATA[($criteria[].property$ BETWEEN #criteria[].lo# AND #criteria[].hi#)]]>
+				</isEqual>
+			</iterate>
+		</isNotEmpty>
+		<!-- 拼接 order by -->
+		<include refid="ibatisCriteriaOrderMySql"/>
+	</sql>
+	
+	<sql id="ibatisCriteriaOrderMySql">
+		<isNotEmpty prepend=" " property="orderByStr">
+			<![CDATA[ORDER BY $orderByStr$]]>
+		</isNotEmpty>
+	</sql>
+	
+	<select id="findHs_IbatisCriteria" resultClass="java.util.HashMap" parameterClass="IbatisHsCriteria">
+		<isNotEmpty prepend=" " property="columnNames">
+			  <![CDATA[SELECT]]>
+			<iterate open=" " close=" " conjunction="," property="columnNames" >   
+	             <![CDATA[$columnNames[]$]]> 
+	        </iterate>
+	        <![CDATA[FROM $tableName$]]>
+		</isNotEmpty>
+		<dynamic prepend="WHERE">
+			<include refid="ibatis_hsCriteriaMySql" />
+		</dynamic>
+	</select>
+	
+	<sql id="findHsIbatisCriteriaColumnName">
+		<isNotEmpty prepend=" " property="columnNames">
+			<iterate open=" " close=" " conjunction="," property="columnNames" >   
+	             <![CDATA[$columnNames[]$]]> 
+	        </iterate>
+	        <![CDATA[FROM $tableName$]]>
+		</isNotEmpty>
+	</sql>
+</sqlMap>
+

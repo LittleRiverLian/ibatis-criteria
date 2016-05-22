@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="semUser">
+
+	<typeAlias alias="SemUser" type="com.hs.ibatis.criterion.sample.entity.SemUser" />
+
+	<resultMap id="SemUserResult" class="SemUser">
+		<result property="id" column="ID" />
+		<result property="userName" column="USER_NAME" />
+		<result property="age" column="AGE" />
+		<result property="address" column="ADDRESS" />
+	</resultMap>
+
+	<sql id="selectAllSemUser"><![CDATA[SELECT ID,USER_NAME,AGE,ADDRESS FROM SEM_USER]]></sql>
+
+	<select id="findAllSemUser" resultMap="SemUserResult" parameterClass="IbatisHsCriteria">
+		<include refid="selectAllSemUser" />
+		<dynamic prepend="WHERE">
+			<include refid="ibatis_hsCriteriaMySql" />
+		</dynamic>
+	</select>
+</sqlMap>
+
