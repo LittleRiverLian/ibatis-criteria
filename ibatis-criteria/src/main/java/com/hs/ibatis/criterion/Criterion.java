@@ -17,4 +17,10 @@ public interface Criterion extends Serializable {
     public void setProperty(String property);
     
     public String getProperty();
+    
+    public String getOp();
+    
+    public String getOpType();
+    
+    public String getSqlString(CriterionQuery criterionQuery);
 }

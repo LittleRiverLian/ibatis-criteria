@@ -1,6 +1,6 @@
 
 
-package com.hs.ibatis.criterion.util;
+package com.hs.ibatis.criterion.common;
 
 import java.util.Collection;
 import java.util.Map;
@@ -10,7 +10,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
 
 
-public abstract class Assert {
+public abstract class PreAssert {
 
 	
 	public static void isTrue(boolean expression, String message) {

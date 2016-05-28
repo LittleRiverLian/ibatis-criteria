@@ -1,8 +1,6 @@
 package com.hs.ibatis.criterion.sample.entity;
 
-import com.hs.ibatis.criterion.beans.BaseIbtsCriteria;
-
-public class SemUser extends BaseIbtsCriteria implements java.io.Serializable {
+public class SemUser implements java.io.Serializable {
 
     private static final long serialVersionUID = 1L;
 

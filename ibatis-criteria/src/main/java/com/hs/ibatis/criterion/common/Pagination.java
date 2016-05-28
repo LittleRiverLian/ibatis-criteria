@@ -1,13 +1,8 @@
-package com.hs.ibatis.criterion.beans;
+package com.hs.ibatis.criterion.common;
 
 import java.util.List;
 
-/**
- * 
- * 
- * @author wangbin1(wangbin1@yihaodian.com)
- * @version Revision: 1.00 Date: 2015-5-13
- */
+
 public class Pagination<T> {
 
 	private List<T> result;

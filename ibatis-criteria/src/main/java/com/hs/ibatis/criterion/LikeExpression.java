@@ -4,6 +4,12 @@
  */
 package com.hs.ibatis.criterion;
 
+import org.apache.commons.lang.StringUtils;
+
+import com.hs.ibatis.criterion.common.ExprOper;
+import com.hs.ibatis.criterion.common.IbsMatchMode;
+import com.hs.ibatis.criterion.common.IbsStringHelper;
+
 /**
  *@FileName  IlikeExpression.java
  *@Date  16-5-20 上午11:31
@@ -15,8 +21,8 @@ public class LikeExpression implements Criterion {
     private  String property;
     private final Object value;
     private final boolean ignoreCase;
-    private final String op;
     private final String matchMode;
+    private final ExprOper exprOper;
     
     protected LikeExpression(String property, Object value) {
 		this(property, value,false, IbsMatchMode.EXACT);
@@ -25,21 +31,29 @@ public class LikeExpression implements Criterion {
     protected LikeExpression(String property, Object value,IbsMatchMode matchMode) {
 		this(property, value,false, matchMode);
 	}
+    
+    protected LikeExpression(String property, Object value,ExprOper exprOper,IbsMatchMode matchMode) {
+    	this.property = property;
+		this.value = value;
+		this.matchMode = matchMode.toString();
+		this.ignoreCase = false;
+		this.exprOper = exprOper;
+	}
 
-	protected LikeExpression(String property, Object value,boolean ignoreCase, IbsMatchMode matchMode) {
+	protected LikeExpression(String property, Object value,boolean ignoreCase,IbsMatchMode matchMode) {
 		this.property = property;
 		this.value = value;
 		this.matchMode = matchMode.toString();
 		this.ignoreCase = ignoreCase;
 		if(ignoreCase){
-			this.op = ExprOper.ilike.toString();
+			this.exprOper = ExprOper.ilike;
 		}else{
-			this.op = ExprOper.like.toString();
+			this.exprOper = ExprOper.like;
 		}
 	}
 
 	public String getProperty() {
-		return property;
+		return StringUtils.trim(property);
 	}
 
 	public Object getValue() {
@@ -51,15 +65,45 @@ public class LikeExpression implements Criterion {
 	}
 
 	public String getOp() {
-		return op;
+		return this.exprOper.getOp();
 	}
 
 	public String getMatchMode() {
 		return matchMode;
 	}
 
+	public String getOpType() {
+		return exprOper.name();
+	}
+
 	@Override
 	public void setProperty(String property) {
 		this.property = property;
+	}
+
+	@Override
+    public String getSqlString(CriterionQuery criterionQuery){
+		String paramterName = criterionQuery.addParameter(property, value);
+		StringBuffer fragment = new StringBuffer();
+    	if(ExprOper.ilike.name().equals(this.getOpType())){
+    		fragment.append("lower(").append(getProperty()).append(")");
+    	}else if(ExprOper.like.name().equals(this.getOpType())){
+    		fragment.append(getProperty());
+    	}
+    	fragment.append(getOp());
+    	if(IbsMatchMode.EXACT.name().equals(matchMode)){
+    		fragment.append(IbsStringHelper.repeatParamFormat(property));
+    	}else if(IbsMatchMode.START.name().equals(matchMode)){
+    		fragment.append("CONCAT('%',").append(IbsStringHelper.repeatParamFormat(paramterName)).append(")");
+    	}else if(IbsMatchMode.END.name().equals(matchMode)){
+    		fragment.append("CONCAT(").append(IbsStringHelper.repeatParamFormat(paramterName)).append(",'%')");
+    	}else if(IbsMatchMode.ANYWHERE.name().equals(matchMode)){
+    		fragment.append("CONCAT('%',").append(IbsStringHelper.repeatParamFormat(paramterName)).append(",'%')");
+    	}
+        return fragment.toString();
+    }
+	
+	public String toString(){
+		return property+ getOp() + value.toString();
 	}
 }

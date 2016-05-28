@@ -4,6 +4,11 @@
  */
 package com.hs.ibatis.criterion;
 
+import com.hs.ibatis.criterion.common.ExprOper;
+import com.hs.ibatis.criterion.common.IbsStringHelper;
+
+import org.apache.commons.lang.StringUtils;
+
 
 /**
  *@FileName  IbsBetweenExpression.java
@@ -16,21 +21,25 @@ public class BetweenExpression implements Criterion {
     private String property;
     private final Object lo;
     private final Object hi;
-    private final String op;
+    private final ExprOper exprOper;
 
     protected BetweenExpression(String property, Object lo, Object hi) {
+        this(property, lo, hi, ExprOper.between);
+    }
+
+    protected BetweenExpression(String property, Object lo, Object hi, ExprOper exprOper) {
         this.property = property;
         this.lo = lo;
         this.hi = hi;
-        this.op = ExprOper.between.toString();
+        this.exprOper = exprOper;
     }
 
     public String getOp() {
-        return op;
+        return this.exprOper.getOp();
     }
 
     public String getProperty() {
-        return property;
+        return StringUtils.trim(property);
     }
 
     public Object getLo() {
@@ -40,9 +49,34 @@ public class BetweenExpression implements Criterion {
     public Object getHi() {
         return hi;
     }
+
+    @Override
+    public void setProperty(String property) {
+        this.property = property;
+    }
+
+    @Override
+    public String getSqlString(CriterionQuery criterionQuery) {
+    	String paramterNamelo = criterionQuery.addParameter(property+"lo", lo);
+    	String paramterNamehi = criterionQuery.addParameter(property+"hi", lo);
+    	StringBuffer buffer = new StringBuffer();
+    	buffer.append("(");
+    	buffer.append(getProperty());
+    	buffer.append(getOp());
+    	buffer.append(IbsStringHelper.repeatParamFormat(paramterNamelo));
+    	buffer.append(" AND ");
+    	buffer.append(IbsStringHelper.repeatParamFormat(paramterNamehi));
+    	buffer.append(")");
+        return buffer.toString();
+    }
     
-	@Override
-	public void setProperty(String property) {
-		this.property = property;
-	}
+    
+    public String toString(){
+    	return getProperty() +getOp()+lo+" AND "+hi;
+    }
+
+    @Override
+    public String getOpType() {
+        return this.exprOper.name();
+    }
 }

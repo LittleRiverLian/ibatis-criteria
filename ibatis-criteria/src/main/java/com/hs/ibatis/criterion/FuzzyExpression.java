@@ -6,35 +6,34 @@ package com.hs.ibatis.criterion;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.hs.common.utils.GetterUtil;
 import com.hs.ibatis.criterion.common.ExprOper;
 import com.hs.ibatis.criterion.common.IbsStringHelper;
 
+
 /**
- *@FileName  IbatisExpression.java
- *@Date  16-5-20 上午11:03
+ *@FileName  FuzzyExpression.java
+ *@Date  16-5-24 下午3:55
  *@author Colley
  *@version 1.0
  */
-public class SimpleExpression implements Criterion {
-    private static final long serialVersionUID = -2835703300683541644L;
+public class FuzzyExpression implements Criterion {
+    private static final long serialVersionUID = 253106397546100801L;
     private String property;
     private final Object value;
-    private final boolean ignoreCase;
+    private final String op;
     private final ExprOper exprOper;
 
-    protected SimpleExpression(String property, ExprOper op) {
-        this(property, null, op, false);
-    }
-
-    protected SimpleExpression(String property, Object value, ExprOper exprOper) {
-        this(property, value, exprOper, false);
-    }
-
-    protected SimpleExpression(String property, Object value, ExprOper exprOper, boolean ignoreCase) {
+    protected FuzzyExpression(String property, Object value, String op) {
         this.property = property;
         this.value = value;
-        this.ignoreCase = ignoreCase;
-        this.exprOper = exprOper;
+        if(StringUtils.isNotEmpty(op)){
+        	if(GetterUtil.isChineseChar(op)){
+        		op = "<>";
+        	}
+        }
+        this.op = op;
+        this.exprOper = ExprOper.fuzzy;
     }
 
     public String getProperty() {
@@ -45,12 +44,12 @@ public class SimpleExpression implements Criterion {
         return value;
     }
 
-    public boolean isIgnoreCase() {
-        return ignoreCase;
-    }
-
     public String getOp() {
-        return exprOper.getOp();
+        return op;
+    }
+    
+    public String getOpType() {
+        return this.exprOper.name();
     }
 
     @Override
@@ -58,13 +57,9 @@ public class SimpleExpression implements Criterion {
         this.property = property;
     }
 
-	public String getOpType() {
-		return exprOper.name();
-	}
-
-	@Override
-    public String getSqlString(CriterionQuery criterionQuery) {
-		String paramterName = criterionQuery.addParameter(property, value);
+    @Override
+    public String getSqlString(CriterionQuery criterionQuery){
+    	String paramterName = criterionQuery.addParameter(property, value);
 		String[] columns = new String[]{property};
 		StringBuffer fragment = new StringBuffer();
 		if (columns.length>1) fragment.append('(');
@@ -76,8 +71,8 @@ public class SimpleExpression implements Criterion {
 		if (columns.length>1) fragment.append(')');
 		return fragment.toString();
     }
-	
-	public String toString(){
-		return property+getOp() + value.toString();
+    
+    public String toString(){
+		return property+" "+getOp()+" " + value.toString();
 	}
 }

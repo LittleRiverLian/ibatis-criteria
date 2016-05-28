@@ -2,7 +2,9 @@
  * Copyright (c) 2016-2017 by Colley
  * All rights reserved.
  */
-package com.hs.ibatis.criterion;
+package com.hs.ibatis.criterion.sql;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
 
@@ -21,22 +23,22 @@ public class IbsOrder implements Serializable {
     public String toString() {
         return propertyName + ' ' + (ascending ? "asc" : "desc");
     }
-    
+
     public String getPropertyName() {
-		return propertyName;
-	}
+        return StringUtils.trim(propertyName);
+    }
 
-	public void setPropertyName(String propertyName) {
-		this.propertyName = propertyName;
-	}
+    public void setPropertyName(String propertyName) {
+        this.propertyName = propertyName;
+    }
 
-	public boolean isAscending() {
-		return ascending;
-	}
+    public boolean isAscending() {
+        return ascending;
+    }
 
-	/**
-     * Constructor for Order.
-     */
+    /**
+    * Constructor for Order.
+    */
     protected IbsOrder(String propertyName, boolean ascending) {
         this.propertyName = propertyName;
         this.ascending = ascending;
@@ -60,5 +62,16 @@ public class IbsOrder implements Serializable {
      */
     public static IbsOrder desc(String propertyName) {
         return new IbsOrder(propertyName, false);
+    }
+
+    public static IbsOrder fuzzy(String propertyName, String order) {
+        boolean ascending = true;
+        if ("desc".equalsIgnoreCase(order)) {
+            ascending = false;
+        } else if ("asc".equalsIgnoreCase(order)) {
+            ascending = true;
+        }
+
+        return new IbsOrder(propertyName, ascending);
     }
 }

@@ -6,6 +6,9 @@ package com.hs.ibatis.criterion;
 
 import java.util.Collection;
 
+import com.hs.ibatis.criterion.common.ExprOper;
+import com.hs.ibatis.criterion.common.IbsMatchMode;
+
 
 /**
  *@FileName  IbsRestrictions.java
@@ -17,7 +20,13 @@ public class IbsRestrictions {
     IbsRestrictions() {
         //cannot be instantiated
     }
+    
 
+    
+    public static FuzzyExpression fuzzy(String propertyName, Object value,String op) {
+        return new FuzzyExpression(propertyName, value,op);
+    }
+    
     /**
       * Apply an "equal" constraint to the named property
       * @param propertyName
@@ -56,6 +65,10 @@ public class IbsRestrictions {
       */
     public static Criterion like(String propertyName, String value, IbsMatchMode matchMode) {
         return new LikeExpression(propertyName, value, matchMode);
+    }
+    
+    public static Criterion notLike(String propertyName, String value, IbsMatchMode matchMode) {
+        return new LikeExpression(propertyName, value,ExprOper.notLike,matchMode);
     }
 
     /**
@@ -132,6 +145,10 @@ public class IbsRestrictions {
     public static Criterion between(String propertyName, Object lo, Object hi) {
         return new BetweenExpression(propertyName, lo, hi);
     }
+    
+    public static Criterion notBetween(String propertyName, Object lo, Object hi) {
+        return new BetweenExpression(propertyName, lo, hi,ExprOper.notBetween);
+    }
 
     /**
       * Apply an "in" constraint to the named property
@@ -140,7 +157,7 @@ public class IbsRestrictions {
       * @return Criterion
       */
     public static Criterion in(String propertyName, Object[] values) {
-        return new SimpleExpression(propertyName, values, ExprOper.in);
+        return new InExpression(propertyName, values, ExprOper.in);
     }
 
     /**
@@ -151,7 +168,7 @@ public class IbsRestrictions {
       */
     @SuppressWarnings("rawtypes")
     public static Criterion in(String propertyName, Collection values) {
-        return new SimpleExpression(propertyName, values.toArray(), ExprOper.in);
+        return new InExpression(propertyName, values.toArray(), ExprOper.in);
     }
     
     /**
@@ -161,7 +178,7 @@ public class IbsRestrictions {
      * @return Criterion
      */
    public static Criterion notIn(String propertyName, Object[] values) {
-       return new SimpleExpression(propertyName, values, ExprOper.notin);
+       return new InExpression(propertyName, values, ExprOper.notin);
    }
 
    /**
@@ -172,7 +189,7 @@ public class IbsRestrictions {
      */
    @SuppressWarnings("rawtypes")
    public static Criterion notIn(String propertyName, Collection values) {
-       return new SimpleExpression(propertyName, values.toArray(), ExprOper.notin);
+       return new InExpression(propertyName, values.toArray(), ExprOper.notin);
    }
 
     /**
@@ -190,4 +207,64 @@ public class IbsRestrictions {
     public static Criterion isNotNull(String propertyName) {
         return new SimpleExpression(propertyName, ExprOper.isNotNull);
     }
+    
+    
+    /**
+	 * Apply an "equal" constraint to two properties
+	 */
+	public static PropertyExpression eqProperty(String propertyName, String otherPropertyName) {
+		return new PropertyExpression(propertyName, otherPropertyName, ExprOper.eq);
+	}
+	/**
+	 * Apply a "not equal" constraint to two properties
+	 */
+	public static PropertyExpression neProperty(String propertyName, String otherPropertyName) {
+		return new PropertyExpression(propertyName, otherPropertyName, ExprOper.ne);
+	}
+	/**
+	 * Apply a "less than" constraint to two properties
+	 */
+	public static PropertyExpression ltProperty(String propertyName, String otherPropertyName) {
+		return new PropertyExpression(propertyName, otherPropertyName,ExprOper.lt);
+	}
+	/**
+	 * Apply a "less than or equal" constraint to two properties
+	 */
+	public static PropertyExpression leProperty(String propertyName, String otherPropertyName) {
+		return new PropertyExpression(propertyName, otherPropertyName, ExprOper.le);
+	}
+	/**
+	 * Apply a "greater than" constraint to two properties
+	 */
+	public static PropertyExpression gtProperty(String propertyName, String otherPropertyName) {
+		return new PropertyExpression(propertyName, otherPropertyName, ExprOper.gt);
+	}
+	/**
+	 * Apply a "greater than or equal" constraint to two properties
+	 */
+	public static PropertyExpression geProperty(String propertyName, String otherPropertyName) {
+		return new PropertyExpression(propertyName, otherPropertyName, ExprOper.ge);
+	}
+	
+	/**
+	 * Group expressions together in a single conjunction (A and B and C...)
+	 *
+	 * @return JunctionExpression
+	 */
+	public static JunctionExpression conjunction() {
+		return new JunctionExpression(ExprOper.AND_JUNC);
+	}
+
+	/**
+	 * Group expressions together in a single disjunction (A or B or C...)
+	 *
+	 * @return JunctionExpression
+	 */
+	public static JunctionExpression disjunction() {
+		return new JunctionExpression(ExprOper.OR_JUNC);
+	}
+	
+	public static PagingExpression limit(int startPos, int pageSize) {
+		return new PagingExpression(startPos, pageSize, ExprOper.limit);
+	}
 }

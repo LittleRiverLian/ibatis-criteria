@@ -2,7 +2,7 @@
  * Copyright (c) 2016-2017 by Colley
  * All rights reserved.
  */
-package com.hs.ibatis.criterion;
+package com.hs.ibatis.criterion.common;
 
 public enum IbsMatchMode {
 	EXACT, START, END, ANYWHERE;

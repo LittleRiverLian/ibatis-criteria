@@ -6,7 +6,7 @@ package com.hs.ibatis.criterion.sample;
 
 import java.util.List;
 
-import com.hs.ibatis.criterion.beans.DetachedIbtsCriteria;
+import com.hs.ibatis.criterion.DetachedHsCriteria;
 import com.hs.ibatis.criterion.sample.entity.SemUser;
 
 
@@ -17,7 +17,7 @@ import com.hs.ibatis.criterion.sample.entity.SemUser;
  *@version 1.0
  */
 public interface ISampleDao {
-    List<SemUser> findByCriteria(DetachedIbtsCriteria detachedIbtsCriteria);
+    List<SemUser> findByCriteria(DetachedHsCriteria detachedIbtsCriteria);
     
-    List<SemUser> findByCriteria(DetachedIbtsCriteria detachedIbtsCriteria,String statment);
+    List<SemUser> findByCriteria(DetachedHsCriteria detachedIbtsCriteria,String statment);
 }

@@ -21,13 +21,11 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 
 import com.alibaba.fastjson.JSON;
+import com.hs.common.utils.GetterUtil;
 import com.hs.ibatis.criterion.Criterion;
-import com.hs.ibatis.criterion.DefaultCriteriRowHandler;
-import com.hs.ibatis.criterion.IbsOrder;
-import com.hs.ibatis.criterion.beans.DetachedIbtsCriteria;
-import com.hs.ibatis.criterion.beans.IbtsCriteria;
-import com.hs.ibatis.criterion.beans.Pagination;
-import com.hs.ibatis.criterion.util.Assert;
+import com.hs.ibatis.criterion.DetachedHsCriteria;
+import com.hs.ibatis.criterion.sql.HsCriteria;
+import com.hs.ibatis.criterion.sql.IbsOrder;
 import com.ibatis.sqlmap.engine.impl.SqlMapClientImpl;
 import com.ibatis.sqlmap.engine.impl.SqlMapExecutorDelegate;
 import com.ibatis.sqlmap.engine.mapping.result.ResultMap;
@@ -73,8 +71,8 @@ public abstract class BaseSqlClientDao extends SqlMapClientDaoSupport {
      */
     private void logRunTime(String statementName, long runTime) {
         if (log.isWarnEnabled()) {
-            log.warn("Sql " + statementName + " executed, Run time estimated: " + runTime + " ms");
             log.warn("current database is " + JSON.toJSONString(ContextHolder.get()));
+            log.warn("Sql " + statementName + " executed, Run time estimated: " + runTime + " ms");
         }
     }
 
@@ -106,6 +104,14 @@ public abstract class BaseSqlClientDao extends SqlMapClientDaoSupport {
         return returnObject;
     }
 
+    protected <T> T qryObjectForCriteria(String statementName, DetachedHsCriteria detachedCriteria)
+        throws DaoException {
+        String resultmappingId = detachedCriteria.getResultMappingId();
+        HsCriteria baseCriteria = detachedCriteria.getCriteria();
+        criteriaPreHandler(resultmappingId, baseCriteria);
+        return this.queryForObject(statementName, baseCriteria);
+    }
+
     /**
      * 返回查询列表
      * @param <T>
@@ -135,27 +141,25 @@ public abstract class BaseSqlClientDao extends SqlMapClientDaoSupport {
         return list;
     }
 
-    protected <T> List<T> queryForCriteria(DetachedIbtsCriteria criteria)
+    protected <T> List<T> queryForCriteria(DetachedHsCriteria criteria)
         throws DaoException {
         return queryForCriteria(criteria, -1, -1);
     }
 
-    protected <T> List<T> queryForCriteria(final DetachedIbtsCriteria criteria, int skipResults, int maxResults)
+    protected <T> List<T> queryForCriteria(final DetachedHsCriteria criteria, int skipResults, int maxResults)
         throws DaoException {
-        Assert.notNull(criteria, "DetachedCriteria must not be null");
+        PreAssert.notNull(criteria, "DetachedCriteria must not be null");
         String mappingId = criteria.getResultMappingId();
         Map<String, String> mapping = fetchResultmapping(mappingId);
-        Assert.notEmpty(mapping, "resultmapping must not be null,mappingId=" + mappingId);
         criteria.addColumnNames(mapping);
-        List<Map<String, Object>> maplist = null;
+        List<T> result = null;
         if ((skipResults == -1) && (maxResults == -1)) {
-            maplist = queryForCriteria(DetachedIbtsCriteria.HS_IBATISCRITERIA, criteria);
+            result = queryForCriteria(criteria.getDynamicQueryByCriteria(), criteria);
         } else {
-            maplist = queryForCriteria(DetachedIbtsCriteria.HS_IBATISCRITERIA, criteria, skipResults, maxResults);
+            result = queryForCriteria(criteria.getDynamicQueryByCriteria(), criteria, skipResults, maxResults);
         }
 
-        DefaultCriteriRowHandler<T> rowHandler = new DefaultCriteriRowHandler<T>();
-        return rowHandler.handleRow(maplist,criteria.getEntityBean().getClass());
+        return result;
     }
 
     /**
@@ -168,36 +172,10 @@ public abstract class BaseSqlClientDao extends SqlMapClientDaoSupport {
      * @author mayuanchao
      * @date 2016年5月20日
      */
-    protected <T> List<T> queryForCriteria(String statementName, String resultMapId, IbtsCriteria baseCriteria,
+    protected <T> List<T> queryForCriteria(String statementName, String resultMapId, HsCriteria baseCriteria,
         int skipResults, int maxResults) throws DaoException {
         statementName = getFullStatementName(statementName);
-        Criterion[] criteria = baseCriteria.getCriteria();
-        List<IbsOrder> orders = baseCriteria.getOrderBys();
-        Map<String, String> mapping = fetchResultmapping(resultMapId);
-
-        //处理order columName
-        if (CollectionUtils.isNotEmpty(orders)) {
-            for (IbsOrder order : orders) {
-                String columname = order.getPropertyName();
-                String newColumname = mapping.get(columname);
-                if (StringUtils.isNotEmpty(newColumname)) {
-                    order.setPropertyName(newColumname);
-                }
-            }
-        }
-
-        //处理动态columName
-        if (ArrayUtils.isNotEmpty(criteria)) {
-            if (MapUtils.isNotEmpty(mapping)) {
-                for (Criterion criter : criteria) {
-                    String columname = criter.getProperty();
-                    String newColumname = mapping.get(columname);
-                    if (StringUtils.isNotEmpty(newColumname)) {
-                        criter.setProperty(newColumname);
-                    }
-                }
-            }
-        }
+        criteriaPreHandler(resultMapId, baseCriteria);
 
         if ((skipResults == -1) && (maxResults == -1)) {
             return this.queryForList(statementName, baseCriteria);
@@ -215,16 +193,16 @@ public abstract class BaseSqlClientDao extends SqlMapClientDaoSupport {
      * @author mayuanchao
      * @date 2016年5月20日
      */
-    protected <T> List<T> queryForCriteria(String statementName, DetachedIbtsCriteria detachedCriteria, int skipResults,
+    protected <T> List<T> queryForCriteria(String statementName, DetachedHsCriteria detachedCriteria, int skipResults,
         int maxResults) throws DaoException {
         String mappingId = detachedCriteria.getResultMappingId();
-        IbtsCriteria baseCriteria = detachedCriteria.getCriteria();
+        HsCriteria baseCriteria = detachedCriteria.getCriteria();
         return queryForCriteria(statementName, mappingId, baseCriteria, skipResults, maxResults);
     }
 
-    protected <T> List<T> queryForCriteria(String statementName, DetachedIbtsCriteria detachedCriteria)
+    protected <T> List<T> queryForCriteria(String statementName, DetachedHsCriteria detachedCriteria)
         throws DaoException {
-        return queryForCriteria(statementName,detachedCriteria, -1, -1);
+        return queryForCriteria(statementName, detachedCriteria, -1, -1);
     }
 
     /**
@@ -533,6 +511,14 @@ public abstract class BaseSqlClientDao extends SqlMapClientDaoSupport {
         return rtn.intValue();
     }
 
+    protected int deleteForCriteria(String statementName, DetachedHsCriteria detachedCriteria)
+        throws DaoException {
+        String resultmappingId = detachedCriteria.getResultMappingId();
+        HsCriteria baseCriteria = detachedCriteria.getCriteria();
+        criteriaPreHandler(resultmappingId, baseCriteria);
+        return this.delete(statementName, baseCriteria);
+    }
+
     /**
      * 删除操作
      * @param statement
@@ -591,6 +577,47 @@ public abstract class BaseSqlClientDao extends SqlMapClientDaoSupport {
         }
     }
 
+    private void criteriaPreHandler(String resultmappingId, HsCriteria baseCriteria) {
+        Criterion[] criteria = baseCriteria.allCriteria();
+        List<IbsOrder> orders = baseCriteria.getOrderBys();
+        Map<String, String> mapping = fetchResultmapping(resultmappingId);
+        if (log.isWarnEnabled()) {
+            log.warn("fetchResultmapping by id:" + resultmappingId + " data={}" + JSON.toJSONString(mapping));
+        }
+
+        //处理order columName
+        if (CollectionUtils.isNotEmpty(orders)) {
+            for (IbsOrder order : orders) {
+                String columname = order.getPropertyName();
+                String newColumname = mapping.get(columname);
+                if (StringUtils.isNotEmpty(newColumname)) {
+                    order.setPropertyName(newColumname);
+                } else {
+                    if (log.isWarnEnabled()) {
+                        log.warn("columname is " + columname + " don't found table columname");
+                    }
+                }
+            }
+        }
+
+        //处理动态columName
+        if (ArrayUtils.isNotEmpty(criteria)) {
+            if (MapUtils.isNotEmpty(mapping)) {
+                for (Criterion criter : criteria) {
+                    String columname = criter.getProperty();
+                    String newColumname = mapping.get(columname);
+                    if (StringUtils.isNotEmpty(newColumname)) {
+                        criter.setProperty(newColumname);
+                    } else {
+                        if (log.isWarnEnabled()) {
+                            log.warn("columname is " + columname + " don't found table columname");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     protected Map<String, String> fetchResultmapping(String id) {
         if (!resultmapping.containsKey(id)) {
             try {
@@ -609,7 +636,9 @@ public abstract class BaseSqlClientDao extends SqlMapClientDaoSupport {
                             mapMapping.put(mapping.getPropertyName(), mapping.getColumnName());
                         }
 
-                        resultmapping.putIfAbsent(mappingId, mapMapping);
+                        if (MapUtils.isNotEmpty(mapMapping)) {
+                            resultmapping.putIfAbsent(mappingId, mapMapping);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -617,6 +646,6 @@ public abstract class BaseSqlClientDao extends SqlMapClientDaoSupport {
             }
         }
 
-        return resultmapping.get(id);
+        return GetterUtil.getFixDatamap(resultmapping.get(id));
     }
 }
