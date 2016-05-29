@@ -22,12 +22,18 @@ public class TableFromCriteria implements HsCriteria {
     private static final long serialVersionUID = 4982984239694001166L;
     private final String tableName;
     private final String op;
-    public String aliasTableName = "";
+    public   String aliasTableName;
 
     public TableFromCriteria(String tableName) {
         this.tableName = tableName;
         this.op = ExprOper.tName.getOp();
         this.aliasTableName = "";
+    }
+    
+    public TableFromCriteria(String tableName,String aliasTableName) {
+        this.tableName = tableName;
+        this.op = ExprOper.tName.getOp();
+        this.aliasTableName = aliasTableName;
     }
 
     @Override
@@ -82,7 +88,7 @@ public class TableFromCriteria implements HsCriteria {
     }
 
     public static TableFromCriteria setTableName(String tableName, String aliasName) {
-        return new TableFromCriteria(tableName + " " + aliasName);
+        return new TableFromCriteria(tableName,aliasName);
     }
 
     @Override
@@ -93,7 +99,7 @@ public class TableFromCriteria implements HsCriteria {
     @Override
     public String getSqlString(CriterionQuery criterionQuery) {
         StringBuffer buffer = new StringBuffer();
-        buffer.append(" ").append(getFromCriteria());
+        buffer.append(" ").append(getFromCriteria()).append(" ");
         buffer.append(getAliasTableName());
         return buffer.toString();
     }
@@ -112,6 +118,11 @@ public class TableFromCriteria implements HsCriteria {
     public HsCriteria addFromClause(HsCriteria fromCriteria, String aliasTableName) {
         throw new UnsupportedOperationException("from TableName don't support");
     }
+    
+    @Override
+	public HsCriteria addFromClause(HsCriteria fromClause) {
+    	throw new UnsupportedOperationException("from TableName don't support");
+	}
 
     @Override
     public HsCriteria addGroupBy(GroupCriteria groupByClause) {

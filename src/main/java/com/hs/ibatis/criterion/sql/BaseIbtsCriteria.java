@@ -158,7 +158,7 @@ public abstract class BaseIbtsCriteria implements HsCriteria {
             String[] fromClausesql = new String[fromClauses.length];
             for (int i = 0; i < fromClauses.length; i++) {
             	if("tName".equals(fromClauses[i].getOp())){
-            		 fromClausesql[i] = fromClauses[i].getSqlString(criterionQuery)+" "+fromClauses[i].getAliasTableName();
+            		fromClausesql[i] = fromClauses[i].getSqlString(criterionQuery);
             	}else{
             		fromClausesql[i] =new StringBuffer()
                     		.append("(")

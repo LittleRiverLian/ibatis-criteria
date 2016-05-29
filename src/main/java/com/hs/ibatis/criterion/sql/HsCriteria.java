@@ -19,7 +19,7 @@ import java.util.List;
  *@version 1.0
  */
 public interface HsCriteria extends Serializable {
-    public Criterion[] getCriteria();
+ public Criterion[] getCriteria();
 
     public Criterion[] allCriteria();
 
@@ -42,7 +42,9 @@ public interface HsCriteria extends Serializable {
     public HsCriteria addColumn(List<String> columnNames);
 
     public HsCriteria addFromClause(HsCriteria fromCriteria, String aliasTableName);
-
+    
+    public HsCriteria addFromClause(HsCriteria fromClause);
+    
     public HsCriteria addGroupBy(GroupCriteria groupByClause);
 
     public HsCriteria addFromJoins(JoinCriteria leftJoinOn);
