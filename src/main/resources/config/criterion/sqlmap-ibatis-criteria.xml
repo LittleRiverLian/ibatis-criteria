@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="">
+  <sql id="ibatis_hsCriteriaOrderSql"> 
+    <isNotEmpty prepend=" " property="orderByStr"> <![CDATA[ORDER BY $orderByStr$]]> </isNotEmpty> 
+  </sql>  
+  <sql id="Ibatis_hsCriteriaGroupBySql"> 
+    <isNotEmpty prepend="" property="groupBy"> <![CDATA[$groupBy.op$]]>  
+      <iterate open=" " close=" " conjunction="," property="groupBy.groupByColumn"> <![CDATA[$groupBy.groupByColumn[]$ ]]> </iterate>  
+      <isNotEmpty prepend=" " property="groupBy.having"> <![CDATA[ HAVING ]]>  
+        <iterate open=" " close=" " conjunction=" AND " property="groupBy.having"> 
+          <isEqual prepend="" property="groupBy.having[].opType" compareValue="eq"> <![CDATA[$groupBy.having[].property$ $groupBy.having[].op$ #groupBy.having[].value#]]> </isEqual>  
+          <isEqual prepend="" property="groupBy.having[].opType" compareValue="ieq"> <![CDATA[lower($groupBy.having[].property$) $groupBy.having[].op$ #groupBy.having[].value#]]> </isEqual>  
+          <isEqual prepend="" property="groupBy.having[].opType" compareValue="ne"> <![CDATA[$groupBy.having[].property$ $groupBy.having[].op$ #groupBy.having[].value#]]> </isEqual>  
+          <isEqual prepend="" property="groupBy.having[].opType" compareValue="like"> 
+            <isEqual prepend="" property="groupBy.having[].matchMode" compareValue="EXACT"> <![CDATA[$groupBy.having[].property$ $groupBy.having[].op$ #groupBy.having[].value#]]> </isEqual>  
+            <isEqual prepend="" property="groupBy.having[].matchMode" compareValue="START"> <![CDATA[$groupBy.having[].property$ $groupBy.having[].op$ CONCAT('%',#groupBy.having[].value#)]]> </isEqual>  
+            <isEqual prepend="" property="groupBy.having[].matchMode" compareValue="END"> <![CDATA[$groupBy.having[].property$ $groupBy.having[].op$ CONCAT(#groupBy.having[].value#,'%')]]> </isEqual>  
+            <isEqual prepend="" property="groupBy.having[].matchMode" compareValue="ANYWHERE"> <![CDATA[$groupBy.having[].property$ $groupBy.having[].op$ CONCAT('%',#groupBy.having[].value#,'%')]]> </isEqual> 
+          </isEqual>  
+          <isEqual prepend="" property="groupBy.having[].opType" compareValue="ilike"> 
+            <isEqual prepend="" property="groupBy.having[].matchMode" compareValue="EXACT"> <![CDATA[lower($groupBy.having[].property$) $groupBy.having[].op$ #groupBy.having[].value#]]> </isEqual>  
+            <isEqual prepend="" property="groupBy.having[].matchMode" compareValue="START"> <![CDATA[lower($groupBy.having[].property$) $groupBy.having[].op$ CONCAT('%',#groupBy.having[].value#)]]> </isEqual>  
+            <isEqual prepend="" property="groupBy.having[].matchMode" compareValue="END"> <![CDATA[lower($groupBy.having[].property$) $groupBy.having[].op$ CONCAT(#groupBy.having[].value#,'%')]]> </isEqual>  
+            <isEqual prepend="" property="groupBy.having[].matchMode" compareValue="ANYWHERE"> <![CDATA[lower($groupBy.having[].property$) $groupBy.having[].op$ CONCAT('%',#groupBy.having[].value#,'%')]]> </isEqual> 
+          </isEqual>  
+          <isEqual prepend="" property="groupBy.having[].opType" compareValue="gt"> <![CDATA[$groupBy.having[].property$ $groupBy.having[].op$ #groupBy.having[].value#]]> </isEqual>  
+          <isEqual prepend="" property="groupBy.having[].opType" compareValue="lt"> <![CDATA[$groupBy.having[].property$ $groupBy.having[].op$ #groupBy.having[].value#]]> </isEqual>  
+          <isEqual prepend="" property="groupBy.having[].opType" compareValue="le"> <![CDATA[$groupBy.having[].property$ $groupBy.having[].op$ #groupBy.having[].value#]]> </isEqual>  
+          <isEqual prepend="" property="groupBy.having[].opType" compareValue="ge"> <![CDATA[$groupBy.having[].property$ $groupBy.having[].op$ #groupBy.having[].value#]]> </isEqual>  
+          <isEqual prepend="" property="groupBy.having[].opType" compareValue="in"> <![CDATA[$groupBy.having[].property$ IN]]>  
+            <iterate open="(" close=")" conjunction="," property="groupBy.having[].values"> <![CDATA[#groupBy.having[].values[]# ]]> </iterate> 
+          </isEqual>  
+          <isEqual prepend="" property="groupBy.having[].opType" compareValue="notin"> <![CDATA[$groupBy.having[].property$ NOT IN]]>  
+            <iterate open="(" close=")" conjunction="," property="groupBy.having[].values"> <![CDATA[#groupBy.having[].values[]# ]]> </iterate> 
+          </isEqual>  
+          <isEqual prepend="" property="groupBy.having[].opType" compareValue="isNull"> <![CDATA[$groupBy.having[].property$ $groupBy.having[].op$]]> </isEqual>  
+          <isEqual prepend="" property="groupBy.having[].opType" compareValue="isNotNull"> <![CDATA[$groupBy.having[].property$ $groupBy.having[].op$]]> </isEqual>  
+          <isEqual prepend="" property="groupBy.having[].opType" compareValue="notBetween"> <![CDATA[($groupBy.having[].property$ NOT BETWEEN #groupBy.having[].lo# AND #groupBy.having[].hi#)]]> </isEqual>  
+          <isEqual prepend="" property="groupBy.having[].opType" compareValue="between"> <![CDATA[($groupBy.having[].property$ BETWEEN #groupBy.having[].lo# AND #groupBy.having[].hi#)]]> </isEqual>  
+          <isEqual prepend="" property="groupBy.having[].opType" compareValue="proExpr"> <![CDATA[$groupBy.having[].propertyName$ $groupBy.having[].op$ $groupBy.having[].otherPropertyName$]]> </isEqual> 
+        </iterate> 
+      </isNotEmpty> 
+    </isNotEmpty> 
+  </sql>
+  
+  <sql id="ibatis_hsCriteriaLimitSql">
+  	<isNotEmpty prepend=" " property="pagingLimit">
+  		<![CDATA[$pagingLimit.op$ #pagingLimit.startPos# , #pagingLimit.pageSize#]]>
+  	</isNotEmpty>
+  </sql>
+  
+  <sql id="ibatis_hsCriteriaWhereSql">
+  		<isEmpty property="criteria"> 
+		  <isNotEmpty property="groupBy"> <![CDATA[1=1]]> </isNotEmpty>  
+		  <isEmpty property="groupBy"> 
+		    <isNotEmpty property="orderByStr"> <![CDATA[1=1]]> </isNotEmpty>
+			<isEmpty property="orderByStr">
+			    	<isNotEmpty property="pagingLimit"> <![CDATA[1=1]]> </isNotEmpty>
+	        </isEmpty>
+		  </isEmpty>
+		</isEmpty>
+	    <isNotEmpty prepend="AND" property="criteria"> 
+	      <iterate prepend="" open="" close="" conjunction=" AND " property="criteria"> 
+	        <isEqual prepend="" property="criteria[].opType" compareValue="eq"> <![CDATA[$criteria[].property$ $criteria[].op$ #criteria[].value#]]> </isEqual>  
+	        <isEqual prepend="" property="criteria[].opType" compareValue="ieq"> <![CDATA[lower($criteria[].property$) $criteria[].op$ #criteria[].value#]]> </isEqual>  
+	        <isEqual prepend="" property="criteria[].opType" compareValue="ne"> <![CDATA[$criteria[].property$ $criteria[].op$ #criteria[].value#]]> </isEqual>  
+	        <isEqual prepend="" property="criteria[].opType" compareValue="like"> 
+	          <isEqual prepend="" property="criteria[].matchMode" compareValue="EXACT"> <![CDATA[$criteria[].property$ $criteria[].op$ #criteria[].value#]]> </isEqual>  
+	          <isEqual prepend="" property="criteria[].matchMode" compareValue="START"> <![CDATA[$criteria[].property$ $criteria[].op$ CONCAT('%',#criteria[].value#)]]> </isEqual>  
+	          <isEqual prepend="" property="criteria[].matchMode" compareValue="END"> <![CDATA[$criteria[].property$ $criteria[].op$ CONCAT(#criteria[].value#,'%')]]> </isEqual>  
+	          <isEqual prepend="" property="criteria[].matchMode" compareValue="ANYWHERE"> <![CDATA[$criteria[].property$ $criteria[].op$ CONCAT('%',#criteria[].value#,'%')]]> </isEqual> 
+	        </isEqual>  
+	        <isEqual prepend="" property="criteria[].opType" compareValue="ilike"> 
+	          <isEqual prepend="" property="criteria[].matchMode" compareValue="EXACT"> <![CDATA[lower($criteria[].property$) $criteria[].op$ #criteria[].value#]]> </isEqual>  
+	          <isEqual prepend="" property="criteria[].matchMode" compareValue="START"> <![CDATA[lower($criteria[].property$) $criteria[].op$ CONCAT('%',#criteria[].value#)]]> </isEqual>  
+	          <isEqual prepend="" property="criteria[].matchMode" compareValue="END"> <![CDATA[lower($criteria[].property$) $criteria[].op$ CONCAT(#criteria[].value#,'%')]]> </isEqual>  
+	          <isEqual prepend="" property="criteria[].matchMode" compareValue="ANYWHERE"> <![CDATA[lower($criteria[].property$) $criteria[].op$ CONCAT('%',#criteria[].value#,'%')]]> </isEqual> 
+	        </isEqual>  
+	        <isEqual prepend="" property="criteria[].opType" compareValue="gt"> <![CDATA[$criteria[].property$ $criteria[].op$ #criteria[].value#]]> </isEqual>  
+	        <isEqual prepend="" property="criteria[].opType" compareValue="lt"> <![CDATA[$criteria[].property$ $criteria[].op$ #criteria[].value#]]> </isEqual>  
+	        <isEqual prepend="" property="criteria[].opType" compareValue="le"> <![CDATA[$criteria[].property$ $criteria[].op$ #criteria[].value#]]> </isEqual>  
+	        <isEqual prepend="" property="criteria[].opType" compareValue="ge"> <![CDATA[$criteria[].property$ $criteria[].op$ #criteria[].value#]]> </isEqual>  
+	        <isEqual prepend="" property="criteria[].opType" compareValue="in"> <![CDATA[$criteria[].property$ IN]]>  
+	          <iterate open="(" close=")" conjunction="," property="criteria[].values"> <![CDATA[#criteria[].values[]# ]]> </iterate> 
+	        </isEqual>  
+	        <isEqual prepend="" property="criteria[].opType" compareValue="notin"> <![CDATA[$criteria[].property$ NOT IN]]>  
+	          <iterate open="(" close=")" conjunction="," property="criteria[].values"> <![CDATA[#criteria[].values[]# ]]> </iterate> 
+	        </isEqual>  
+	        <isEqual prepend="" property="criteria[].opType" compareValue="isNull"> <![CDATA[$criteria[].property$ $criteria[].op$]]> </isEqual>  
+	        <isEqual prepend="" property="criteria[].opType" compareValue="isNotNull"> <![CDATA[$criteria[].property$ $criteria[].op$]]> </isEqual>  
+	        <isEqual prepend="" property="criteria[].opType" compareValue="notBetween"> <![CDATA[($criteria[].property$ NOT BETWEEN #criteria[].lo# AND #criteria[].hi#)]]> </isEqual>  
+	        <isEqual prepend="" property="criteria[].opType" compareValue="between"> <![CDATA[($criteria[].property$ BETWEEN #criteria[].lo# AND #criteria[].hi#)]]> </isEqual>  
+	        <isEqual prepend="" property="criteria[].opType" compareValue="proExpr"> <![CDATA[$criteria[].propertyName$ $criteria[].op$ $criteria[].otherPropertyName$]]> </isEqual> 
+	      </iterate> 
+	    </isNotEmpty>
+    
+    <!-- 拼接 group by -->  
+    <include refid="Ibatis_hsCriteriaGroupBySql"/>
+    
+    <!-- 拼接 order by -->  
+    <include refid="ibatis_hsCriteriaOrderSql"/>  
+    
+     <!-- 拼接 limit -->  
+    <include refid="ibatis_hsCriteriaLimitSql"/>
+      
+    <!--  <isNotEmpty prepend=" " property="orderByStr"> <![CDATA[ORDER BY $orderByStr$]]> </isNotEmpty> --> 
+  </sql>  
+  
+  <sql id="Ibatis_hsCriteriaScopeJoinSql"> 
+    <isNotEmpty prepend="" property="fromJoins"> 
+      <iterate open="" close="" conjunction=" " property="fromJoins">$fromJoins[].op$ $tableName$ ON $fromJoins[].onCriteria.propertyName$= $fromJoins[].onCriteria.otherPropertyName$
+        <isNotEmpty prepend=" " property="fromJoins[].criteria"> 
+          <iterate prepend="" open="" close="" conjunction=" AND " property="fromJoins[].criteria"> 
+            <isEqual prepend="" property="fromJoins[].criteria[].opType" compareValue="eq"> <![CDATA[$fromJoins[].criteria[].property$ $fromJoins[].criteria[].op$ #fromJoins[].criteria[].value#]]> </isEqual>  
+            <isEqual prepend="" property="fromJoins[].criteria[].opType" compareValue="ieq"> <![CDATA[lower($fromJoins[].criteria[].property$) $fromJoins[].criteria[].op$ #fromJoins[].criteria[].value#]]> </isEqual>  
+            <isEqual prepend="" property="fromJoins[].criteria[].opType" compareValue="ne"> <![CDATA[$fromJoins[].criteria[].property$ $fromJoins[].criteria[].op$ #fromJoins[].criteria[].value#]]> </isEqual>  
+            <isEqual prepend="" property="fromJoins[].criteria[].opType" compareValue="like"> 
+              <isEqual prepend="" property="fromJoins[].criteria[].matchMode" compareValue="EXACT"> <![CDATA[$fromJoins[].criteria[].property$ $fromJoins[].criteria[].op$ #fromJoins[].criteria[].value#]]> </isEqual>  
+              <isEqual prepend="" property="fromJoins[].criteria[].matchMode" compareValue="START"> <![CDATA[$fromJoins[].criteria[].property$ $fromJoins[].criteria[].op$ CONCAT('%',#fromJoins[].criteria[].value#)]]> </isEqual>  
+              <isEqual prepend="" property="fromJoins[].criteria[].matchMode" compareValue="END"> <![CDATA[$fromJoins[].criteria[].property$ $fromJoins[].criteria[].op$ CONCAT(#fromJoins[].criteria[].value#,'%')]]> </isEqual>  
+              <isEqual prepend="" property="fromJoins[].criteria[].matchMode" compareValue="ANYWHERE"> <![CDATA[$fromJoins[].criteria[].property$ $fromJoins[].criteria[].op$ CONCAT('%',#fromJoins[].criteria[].value#,'%')]]> </isEqual> 
+            </isEqual>  
+            <isEqual prepend="" property="fromJoins[].criteria[].opType" compareValue="ilike"> 
+              <isEqual prepend="" property="fromJoins[].criteria[].matchMode" compareValue="EXACT"> <![CDATA[lower($fromJoins[].criteria[].property$) $fromJoins[].criteria[].op$ #fromJoins[].criteria[].value#]]> </isEqual>  
+              <isEqual prepend="" property="fromJoins[].criteria[].matchMode" compareValue="START"> <![CDATA[lower($fromJoins[].criteria[].property$) $fromJoins[].criteria[].op$ CONCAT('%',#fromJoins[].criteria[].value#)]]> </isEqual>  
+              <isEqual prepend="" property="fromJoins[].criteria[].matchMode" compareValue="END"> <![CDATA[lower($fromJoins[].criteria[].property$) $fromJoins[].criteria[].op$ CONCAT(#fromJoins[].criteria[].value#,'%')]]> </isEqual>  
+              <isEqual prepend="" property="fromJoins[].criteria[].matchMode" compareValue="ANYWHERE"> <![CDATA[lower($fromJoins[].criteria[].property$) $fromJoins[].criteria[].op$ CONCAT('%',#fromJoins[].criteria[].value#,'%')]]> </isEqual> 
+            </isEqual>  
+            <isEqual prepend="" property="fromJoins[].criteria[].opType" compareValue="gt"> <![CDATA[$fromJoins[].criteria[].property$ $fromJoins[].criteria[].op$ #fromJoins[].criteria[].value#]]> </isEqual>  
+            <isEqual prepend="" property="fromJoins[].criteria[].opType" compareValue="lt"> <![CDATA[$fromJoins[].criteria[].property$ $fromJoins[].criteria[].op$ #fromJoins[].criteria[].value#]]> </isEqual>  
+            <isEqual prepend="" property="fromJoins[].criteria[].opType" compareValue="le"> <![CDATA[$fromJoins[].criteria[].property$ $fromJoins[].criteria[].op$ #fromJoins[].criteria[].value#]]> </isEqual>  
+            <isEqual prepend="" property="fromJoins[].criteria[].opType" compareValue="ge"> <![CDATA[$fromJoins[].criteria[].property$ $fromJoins[].criteria[].op$ #fromJoins[].criteria[].value#]]> </isEqual>  
+            <isEqual prepend="" property="fromJoins[].criteria[].opType" compareValue="in"> <![CDATA[$fromJoins[].criteria[].property$ IN]]>  
+              <iterate open="(" close=")" conjunction="," property="fromJoins[].criteria[].values"> <![CDATA[#fromJoins[].criteria[].values[]# ]]> </iterate> 
+            </isEqual>  
+            <isEqual prepend="" property="fromJoins[].criteria[].opType" compareValue="notin"> <![CDATA[$fromJoins[].criteria[].property$ NOT IN]]>  
+              <iterate open="(" close=")" conjunction="," property="fromJoins[].criteria[].values"> <![CDATA[#fromJoins[].criteria[].values[]# ]]> </iterate> 
+            </isEqual>  
+            <isEqual prepend="" property="fromJoins[].criteria[].opType" compareValue="isNull"> <![CDATA[$fromJoins[].criteria[].property$ $fromJoins[].criteria[].op$]]> </isEqual>  
+            <isEqual prepend="" property="fromJoins[].criteria[].opType" compareValue="isNotNull"> <![CDATA[$fromJoins[].criteria[].property$ $fromJoins[].criteria[].op$]]> </isEqual>  
+            <isEqual prepend="" property="fromJoins[].criteria[].opType" compareValue="notBetween"> <![CDATA[($fromJoins[].criteria[].property$ NOT BETWEEN #fromJoins[].criteria[].lo# AND #fromJoins[].criteria[].hi#)]]></isEqual>  
+            <isEqual prepend="" property="fromJoins[].criteria[].opType" compareValue="between"> <![CDATA[($fromJoins[].criteria[].property$ BETWEEN #fromJoins[].criteria[].lo# AND #fromJoins[].criteria[].hi#)]]> </isEqual>  
+            <isEqual prepend="" property="fromJoins[].criteria[].opType" compareValue="proExpr"> <![CDATA[$fromJoins[].criteria[].propertyName$ $fromJoins[].criteria[].op$ $fromJoins[].criteria[].otherPropertyName$]]> </isEqual> 
+          </iterate> 
+        </isNotEmpty> 
+      </iterate> 
+    </isNotEmpty> 
+  </sql>  
+  
+  <sql id="Ibatis_hsCriteriaSelectColumnNameSql"> 
+    <isNotEmpty prepend="" property="columnNames"> 
+      <iterate open="" close="" conjunction="," property="columnNames"> 
+        <isEmpty prepend="" property="columnNames[].include"><![CDATA[$columnNames[].columnName$]]></isEmpty> 
+      </iterate> 
+    </isNotEmpty> 
+  </sql>  
+  
+  <select id="Ibatis_QueryByCriteriaSelect" resultClass="java.util.HashMap" parameterClass="IbatisHsCriteria"> 
+    <isNotEmpty prepend=" " property="columnNames"> <![CDATA[SELECT]]>  
+      <iterate open="" close="" conjunction="," property="columnNames"> 
+        <isEmpty prepend="" property="columnNames[].include"><![CDATA[$columnNames[].columnName$]]></isEmpty> 
+      </iterate> 
+    </isNotEmpty>  
+    <isNotEmpty prepend="from" property="fromClause"> 
+      <iterate open="" close="" conjunction="," property="fromClause"> 
+        <isEqual prepend=" " property="fromClause[].opType" compareValue="tName">$fromClause[].fromCriteria$ $fromClause[].aliasTableName$</isEqual> 
+      </iterate> 
+    </isNotEmpty>  
+    <include refid="Ibatis_hsCriteriaScopeJoinSql"/>  
+    <dynamic prepend="WHERE"> 
+      <include refid="ibatis_hsCriteriaWhereSql"/>  
+    </dynamic> 
+  </select> 
+  
+</sqlMap>

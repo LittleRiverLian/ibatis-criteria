@@ -6,5 +6,5 @@
 <settings cacheModelsEnabled="false" enhancementEnabled="false"
 		lazyLoadingEnabled="false" maxRequests="3000" maxSessions="3000"
 		maxTransactions="3000"/>
-	
+	<sqlMap resource="config/criterion/sqlmap-ibatis-criteria.xml"/>
 </sqlMapConfig>
