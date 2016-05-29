@@ -214,7 +214,7 @@
 	
 	
 	<build>
-		<finalName>hscaptcha</finalName>
+		<finalName>ibatis-criteria</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/java</directory>
